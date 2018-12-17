@@ -108,6 +108,8 @@ let ifLine = function (line, i){
     return line;
 };
 
+
+
 let ifSearchAndEval = function () {
     let tmp, line = 1;
     for (let i = 0; i < sub.length; i++){
