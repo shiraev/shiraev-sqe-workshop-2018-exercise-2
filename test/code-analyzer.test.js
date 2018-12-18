@@ -168,7 +168,7 @@ describe('The javascript parser', () => {
         );
     });
 
-    it('TEST 9', () => {
+    it('TEST 10', () => {
         assert.equal(
             JSON.stringify(parseCode('let b = 10\n' +
                 'function foo(x, y, z){\n' +
