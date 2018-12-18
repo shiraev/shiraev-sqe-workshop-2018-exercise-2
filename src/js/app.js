@@ -29,7 +29,7 @@ let extractParams = function (x){
         return (x.params).map( x => x['name']);
     return [];
 };
-
+/*
 let extractArgsVal = function(x) {
     let values = [];
     for(let i = 0; i < x.length; i++){
@@ -38,6 +38,11 @@ let extractArgsVal = function(x) {
         }
     }
     return values;
+};*/
+
+let extractArgsVal = function(x) {
+    let values = x.substring(1, x.length - 1).split(' ');
+    return values.filter(x => x !== ',');
 };
 let varHandlerValueHelper = function (x) {
     if(x.init !== null){
@@ -71,10 +76,29 @@ let handleGlobal = function (x) {
     }
 };
 
+let handleArray = function(varT){
+    let vars = [];
+    let values;
+    if(varT.value.indexOf('[') !== -1){
+        let vals = (varT.value).substring(1, varT.value.length -1 );
+        values = (vals).split(',');
+        for (let i = 0; i < values.length; i++) {
+            vars[i] = varOrganizer(varT.name + '[' + i + ']', values[i]);
+        }
+    }
+    return vars;
+};
+
 let mergeValues = function (){
     let argsVal = [];
-    for (let i= 0; i < params.length; i++)
-        argsVal[i] = varOrganizer(params[i], userInput[i]);
+    for (let i= 0, j = 0; j < params.length; i++, j ++) {
+        argsVal[i] = varOrganizer(params[j], userInput[j]);
+        let tmp = handleArray(argsVal[i]);
+        if(tmp.length !== 0){
+            argsVal = argsVal.concat(tmp);
+            i = i + tmp.length;
+        }
+    }
     globals = globals.concat(argsVal);
 };
 let getRealVal = function (x) {

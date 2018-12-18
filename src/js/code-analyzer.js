@@ -99,33 +99,28 @@ let valueRewrite = function(value, scope, depth){
     else
         return valueRewriteUnScope(value);
 };
-/*
+
 let specialParam = function(value){
     let index = value.search(' ');
-    let val = value.substring(0, index - 1);
-    if(val.indexOf('[') > -1){
-        return val;
-    }
-    else{
-        let arrayS = val.indexOf('[');
-        let arrayE = val.indexOf(']');
-        let num = parseInt(value.substring(arrayS + 1, arrayE - 1));
-    }
-};*/
+    if(index === 0) index = 1;
+    if(index === -1) index = value.length;
+    let val = value.substring(0, index);
+    return {val, index};
+};
 let valueRewriteUnScope = function(value){
-    let valOr = value;
-    let flag = 1;
+    let valOr = value, flag = 1, index;
     value = '(' + value + ' ';
-    for (let i = 0; i < value.length && 1; i++){
-        let param = value.substring(i,i+1);
+    for (let i = 0; i < valOr.length && 1; i = i + index){
+        let val = specialParam(valOr.substring(i, valOr.length));
+        let  param = val.val;
+        index = val.index;
         if (inVarDecTable(param)){
             flag = 2;
-            let index = value.search(param + ' ');
-            let paramVal = getRealVal(param);
+            let index = value.search(param + ' '), paramVal = getRealVal(param) + ' ';
             let tmp = value;
             value = value.substring(0, index).concat(paramVal)
                 .concat(tmp.substring(index + 1 + param.length, tmp.length));
-            i = i + 1 + paramVal.length;
+            i = i + param.length;
         }
     }
     if(flag === 1)
@@ -135,19 +130,19 @@ let valueRewriteUnScope = function(value){
 
 
 let valueRewriteScope = function(value, depth){
-    let valOr = value;
-    let flag = 1;
+    let valOr = value, flag = 1, index;
     value = '(' + value + ' ';
-    for (let i = 0; i < value.length && 1; i++){
-        let param = value.substring(i,i+1);
+    for (let i = 0; i < valOr.length && 1; i = i + index){
+        let val = specialParam(valOr.substring(i, valOr.length)), param = val.val;
+        index = val.index;
         if (inScopedVarDecTable(param, depth)){
             flag = 2;
             let index = value.search(param + ' ');
-            let paramVal = getScopedRealVal(param, depth);
+            let paramVal = getScopedRealVal(param, depth) + ' ';
             let tmp = value;
             value = value.substring(0, index).concat(paramVal)
                 .concat(tmp.substring(index + 1 + param.length, tmp.length));
-            i = i + 1 + paramVal.length;
+            i = i + param.length;
         }
     }
     if(flag === 1)
